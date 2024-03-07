@@ -1,7 +1,8 @@
 #!/bin/bash
 
 echo "Copy contents from /etc/skel to Home directory? (Y/n)"
-read -r response
+# shellcheck disable=SC2162
+read response
 
 if [[ "$response" == [yY] ]]; then
 
