@@ -1,2 +1,30 @@
 #!/bin/bash
 #set -e
+
+if lsblk | grep -q "/boot/efi" ; then
+	echo
+	echo "Re-installing the default systemd-boot from ArcoLinux"
+	echo
+    
+	sudo pacman -S --noconfirm kernel-install-mkinitcpio
+	sudo bootctl install
+	sudo reinstall-kernels
+
+	if [[ -f /boot/efi/loader/loader.conf ]];then
+		sudo sed -i "s/#timeout 3/timeout 3/g" /boot/efi/loader/loader.conf
+	fi
+
+	if [[ -f /boot/efi/loader/loader.conf ]];then
+		sudo sed -i "s/#console-mode keep/console-mode keep/g" /boot/efi/loader/loader.conf
+	fi
+
+	echo
+	echo "Task Completed!"
+	echo
+
+else
+	echo
+	echo "Task Falied!"
+	echo "More on: https://wiki.archlinux.org/title/Arch_boot_process"
+	echo
+fi
