@@ -1,3 +1,63 @@
 #!/bin/bash
 #set -e
 
+echo
+echo "Reinstalling Grub..."
+echo
+
+Online=0
+file_boolean=0
+
+function check_connectivity() {
+    local test_ip
+    local test_count
+
+    test_ip="172.217.12.110"
+    test_count=1
+
+    if ping -c ${test_count} ${test_ip} > /dev/null; then
+       echo "System Online."
+       Online=1
+    else
+       echo "System Offline!"
+       Online=0
+    fi
+ }
+
+function check_file() {
+	file="/usr/local/share/snigdhaos/grub/grub"
+	if [[ -f $file ]];then
+    	echo $file " exists"
+    	file_boolean=1
+	else
+    	echo $file " doesn't exist"
+    	file_boolean=0
+	fi
+}
+
+check_connectivity
+check_file
+
+
+# pacman config + online
+if [ $Online -eq 1 ] ; then
+	echo "Downloading Default Grub..."
+	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-arctic/master/archiso/airootfs/etc/default/grub -O $workdir/etc/default/grub
+fi
+
+# pacman config + not online
+if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
+	sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
+	echo "Copied Grub Locally!"
+fi
+
+#putting old pacman config back
+if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
+	echo "Run this script once you are back online"
+fi
+
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+echo
+echo "Task Completed!"
+echo 
