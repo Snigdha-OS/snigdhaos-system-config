@@ -38,20 +38,16 @@ function check_file() {
 check_connectivity
 check_file
 
-
-# pacman config + online
 if [ $Online -eq 1 ] ; then
 	echo "Downloading Default Grub..."
 	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-arctic/master/archiso/airootfs/etc/default/grub -O $workdir/etc/default/grub
 fi
 
-# pacman config + not online
 if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
 	sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
 	echo "Copied Grub Locally!"
 fi
 
-#putting old pacman config back
 if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
 	echo "Run this script once you are back online"
 fi
