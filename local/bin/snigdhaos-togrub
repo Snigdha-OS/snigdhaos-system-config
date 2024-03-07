@@ -1,0 +1,67 @@
+#!/bin/bash
+#set -e
+
+echo
+echo "Reinstalling Grub..."
+echo
+
+Online=0
+file_boolean=0
+
+function check_connectivity() {
+    local test_ip
+    local test_count
+
+    test_ip="172.217.12.110"
+    test_count=1
+
+    if ping -c ${test_count} ${test_ip} > /dev/null; then
+       echo "System Online!"
+       Online=1
+    else
+       echo "System Offline!"
+       Online=0
+    fi
+ }
+
+function check_file() {
+	file="/usr/local/share/snigdhaos/grub/grub"
+	if [[ -f $file ]];then
+    	echo $file " Found."
+    	file_boolean=1
+	else
+    	echo $file " Not Found!"
+    	file_boolean=0
+	fi
+}
+
+check_connectivity
+check_file
+
+if [ $Online -eq 1 ] ; then
+	echo "getting latest /etc/default/grub from github"
+	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O $workdir/etc/default/grub
+fi
+
+if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
+	sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
+	echo "Copied Grub From System!"
+fi
+
+if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
+	echo "Run this script once you are back online"
+fi
+
+sudo pacman -R --noconfirm kernel-install-mkinitcpio
+
+echo
+echo "Updating your /boot/grub/grub.cfg to apply the grub default file..."
+echo
+
+sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos
+
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+echo
+echo "Make sure you installed snigdhaos-grub-theme"
+echo
