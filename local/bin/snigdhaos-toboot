@@ -3,9 +3,9 @@
 
 if lsblk | grep -q "/boot/efi" ; then
 	echo
-	echo "Re-installing the default systemd-boot from ArcoLinux"
+	echo "Reinstalling systemd-boot..."
 	echo
-    
+
 	sudo pacman -S --noconfirm kernel-install-mkinitcpio
 	sudo bootctl install
 	sudo reinstall-kernels
