@@ -1,0 +1,73 @@
+#!/bin/bash
+#set -e
+
+Online=0
+function check_connectivity() {
+    local test_ip
+    local test_count
+
+    test_ip="172.217.12.110"
+    test_count=1
+
+    if ping -c ${test_count} ${test_ip} > /dev/null; then
+       	echo 
+       	echo "System Online!"
+       	echo
+       	Online=1
+    else
+    	echo
+        echo "System Offline! Unable To Download snigdhaos-keyring!"
+       	echo
+       	Online=0
+    fi
+ }
+
+check_connectivity
+
+if [ $Online -eq 1 ] ; then
+	echo
+	echo "Installing snigdhaos-keyring..."
+	echo
+	sudo pacman -Sy snigdhaos-keyring --noconfirm
+	echo
+fi
+
+echo
+echo "Removing prevoius pacman databases at /var/lib/pacman/sync/*"
+echo
+sudo rm /var/lib/pacman/sync/*
+echo
+
+echo
+echo "Removing prevoius /etc/pacman.d/gnupg folder"
+echo
+sudo rm -rf /etc/pacman.d/gnupg/*
+echo
+
+echo
+echo "Initializing pacman keys..."
+echo
+sudo pacman-key --init
+echo
+
+echo
+echo "Populating keyring..."
+echo 
+sudo pacman-key --populate
+echo
+
+echo
+echo "Adding Ubuntu keyserver..."
+echo 
+echo "
+keyserver hkp://keyserver.ubuntu.com:80" | sudo tee --append /etc/pacman.d/gnupg/gpg.conf
+
+echo
+echo "Synchronizing Database..."
+echo 
+sudo pacman -Sy
+echo
+
+echo
+echo "Task Completed!"
+echo
