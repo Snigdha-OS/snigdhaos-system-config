@@ -1,0 +1,12 @@
+#!/bin/bash
+#set -e
+
+echo
+echo "Applying lsb Release..."
+echo
+
+sudo cp /usr/local/share/snigdhaos/release/lsb-release-snigdhaos /etc/lsb-release
+
+echo
+echo "Task Completed!"
+echo

@@ -1,0 +1,13 @@
+#!/bin/bash
+#set -e
+
+echo
+echo "Applying OS Release..."
+echo
+
+sudo cp /usr/local/share/snigdhaos/release/os-release-snigdhaos /usr/lib/os-release
+sudo cp /usr/local/share/snigdhaos/release/os-release-snigdhaos /usr/lib/os-release-snigdhaos
+
+echo
+echo "Task Completed!"
+echo
