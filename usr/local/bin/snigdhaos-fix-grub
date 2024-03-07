@@ -1,6 +1,4 @@
 #!/bin/bash
-#set -e
-# shellcheck disable=SC2154
 
 echo
 echo "Reinstalling Grub..."
@@ -41,6 +39,7 @@ check_file
 
 if [ $Online -eq 1 ] ; then
 	echo "Downloading Default Grub..."
+	# shellcheck disable=SC2154
 	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir"/etc/default/grub
 fi
 

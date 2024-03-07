@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -e
 
 echo
 echo "Copying /etc/pacman.d/gnupg/gpg.conf"

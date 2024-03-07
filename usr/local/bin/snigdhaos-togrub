@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -e
 
 echo
 echo "Reinstalling Grub..."
@@ -40,6 +39,8 @@ check_file
 
 if [ $Online -eq 1 ] ; then
 	echo "getting latest /etc/default/grub from github"
+	# shellcheck disable=SC2086
+	# shellcheck disable=SC2154
 	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O $workdir/etc/default/grub
 fi
 

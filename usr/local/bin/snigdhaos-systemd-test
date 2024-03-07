@@ -1,10 +1,9 @@
 #!/bin/bash
 
-#set -e
-
 boot=$(bootctl status | grep Product | awk '{printf($2)}')
 echo "The system is using $boot to boot."
 
+# shellcheck disable=SC2086
 if [ $boot = "GRUB" ]; then
 	/usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos --disable-shim-lock --removable
 fi

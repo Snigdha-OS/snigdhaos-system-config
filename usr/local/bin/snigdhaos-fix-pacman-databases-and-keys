@@ -1,5 +1,4 @@
 #!/bin/bash
-# set -e
 
 Online=0
 function check_connectivity() {
