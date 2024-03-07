@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo "Copy contents from /etc/skel to Home directory? (Y/n)"
+read -r response
+
+if [[ "$response" == [yY] ]]; then
+
+	time=$(date +%Y.%m.%d-%H.%M.%S)
+	if [ ! -d ~/.config ]; then
+		mkdir ~/.config
+	fi
+	echo
+	# shellcheck disable=SC2086
+	echo "Backing up .config folder to ~/.config-backup-"$time
+	echo
+
+	# shellcheck disable=SC2086
+	cp -Rf ~/.config ~/.config-backup-$time
+
+	echo
+	echo "Overwriting existing .config folder with the files from /etc/skel"
+	echo
+
+	# shellcheck disable=SC2086
+	cp -r /etc/skel/. $HOME
+
+	echo
+	echo "Task Completed!"
+	echo
+
+else
+  	echo
+  	echo "No change!"
+  	echo
+fi
