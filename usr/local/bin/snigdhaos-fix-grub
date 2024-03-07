@@ -41,7 +41,7 @@ check_file
 
 if [ $Online -eq 1 ] ; then
 	echo "Downloading Default Grub..."
-	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O $workdir/etc/default/grub
+	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir"/etc/default/grub
 fi
 
 if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
