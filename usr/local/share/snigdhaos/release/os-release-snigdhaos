@@ -1,11 +1,11 @@
-NAME="Snigdha OS"
+NAME="SNIGDHA OS"
 PRETTY_NAME="SNIGDHA OS"
 ID=arch
-BUILD_ID=arctic
+BUILD_ID=ARCTIC
 ANSI_COLOR="38;2;23;147;209"
 HOME_URL="https://snigdhaos.org/"
-DOCUMENTATION_URL="https://wiki.snigdhaos.org/"
-SUPPORT_URL="https://dscuss.snigdhaos.org/"
+DOCUMENTATION_URL="https://snigdhaos.org/documentation/"
+SUPPORT_URL="https://forum.snigdhaos.org/"
 BUG_REPORT_URL="https://github.com/Snigdha-OS/snigdhaos-arctic/issues"
 PRIVACY_POLICY_URL="https://snigdhaos.org/privacy-policy/"
-LOGO=snigdha-os
+LOGO=snigdhaos-hello
