@@ -1,2 +1,11 @@
 #!/usr/bin/bash
 set -e
+
+EXEC_TERMINAL=bash
+
+usage() {
+	echo "Usage: ${0##*/} [cmd]"
+	echo '    -s [shell]         Change shell to [shell]'
+	echo '    -h                 This help'
+	exit 1
+}
