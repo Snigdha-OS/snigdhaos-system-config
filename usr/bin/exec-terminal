@@ -22,3 +22,16 @@ while getopts "${opts}" arg; do
 		;;
 	esac
 done
+
+shift $(($OPTIND - 1))
+
+initfile="$(mktemp)"
+codefile="$initfile"
+echo "#!/usr/bin/env bash" >"$initfile"
+if [ "$EXEC_TERMINAL" != "bash" ]; then
+	codefile="$(mktemp)"
+	echo "$EXEC_TERMINAL $codefile" >>"$initfile"
+fi
+echo "$1" >>"$codefile"
+chmod +x "$initfile"
+cmd="\"$initfile\""
