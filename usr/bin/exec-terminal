@@ -9,3 +9,16 @@ usage() {
 	echo '    -h                 This help'
 	exit 1
 }
+
+opts='s:h'
+
+while getopts "${opts}" arg; do
+	case "${arg}" in
+	s) EXEC_TERMINAL="$OPTARG" ;;
+	h | ?) usage 0 ;;
+	*)
+		echo "Invalid Argument '${arg}'!"
+		usage 1
+		;;
+	esac
+done

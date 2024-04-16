@@ -25,4 +25,4 @@ MESSAGE="⏳ @eshanized updated the repository 🎉 !!!"
 # Git Action
 git add .
 git commit -m "$MESSAGE"
-git push origin "$BRANCH"
+# git push origin "$BRANCH"
