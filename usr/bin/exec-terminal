@@ -61,3 +61,12 @@ MATE)
 	terminal=mate-terminal
 	;;
 esac
+
+if [ -z "$terminal" ] || ! command -v "$terminal" &>/dev/null; then
+	for i in ${term_order[@]}; do
+		if command -v "$i" &>/dev/null; then
+			terminal="$i"
+			break
+		fi
+	done
+fi
