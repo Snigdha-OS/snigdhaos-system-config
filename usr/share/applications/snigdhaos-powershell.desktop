@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Snigdha OS PowerShell
+Comment=Snigdha OS PowerShell
+Icon=snigdhaos-powershell
+Exec=exec-terminal 'pwsh'
+Terminal=false
+Categories=Tags;Describing;Application;Utility
