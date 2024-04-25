@@ -1,24 +1,18 @@
-               .,:cccccc:;'.                      
-          ,lx0XXXXXXXXXXXXXXXOdc.                 
-       ;xKXXXXXXXXXXXXXXXXXXXXXXXKd'              
-       xXXXXXXXXXXXXXXXXXXXXXXXXXXXXO:            
-         xXXXXXXXXXXXXXXXXXXXXXXXXXXXX0.          
-          dXl                kXXXXXXXXXXc         
-                       .Oxo:'   oXXXXXXXXx        
-            .,:cloolc:'.   .XKd'  ,XXXXXXXc       
-        .cxKXXXXXXXXXXXXKx:   OXx'  XXXXXXX       
-      .kXXXXXXXXXXXXXXXXXXXXl  .XXo  XXXXXX;      
-     oXXXXXXXXXXXXXXXXXXXXXXXK:  KX. dXXXXXo      
-    0XXXXXXXXXXXXXXXXXXXXXXXXXXo  '  :XXXXXl      
-   kXXXXXXXXXXXXXXXXXXXXXXXXXXXX,    kXXXXX'      
-   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXK    XXXXXK       
-  .XXXXX',XXXXXXXXXXXXXXXXXXXXXXX   'XXXXX        
-  .XXXd .0XXXXXXXXXXXXXXXXXXXXXXX   oXXXX.        
-  .Xx  .KXXXXXXXXXXXXXXXXXXXXXXXX   KXXX:         
-        XXXXXXXXXXXXXXXXXXXXXXXXX   cXXX          
-       'XXXXXXXXXXXXXXXXXXXXXXXX:    dXd          
-      .KXXXXXXXXXXXXXXXx               l          
-     xXXXXXXXXXXXXXXXO                            
-    'XXXXXXXXXXXXXX.                              
-    'XXXXXXXXXX0                                  
-     XXXXX0     
+   ..                                    ..   
+   .c:'                                ':c'   
+   .ccc:'                            ':ccc'   
+   .ccccc:'                        ':ccccc'   
+   .ccccccc:,                    ,:ccccccc'   
+   .cccc 'ccc:,.              .,:ccc, cccc'   
+   .cccc   'cc.       ,,        cc'   cccc'   
+   .cccc            ,:ccc,.           cccc'   
+   .cccc         .,cccccccc;.         cccc'   
+    :ccc:'       .ccc'  .cccc;.     ':ccc:    
+      :ccc:,              .cccc:..,:ccc:      
+        ,cccc,              .cccccccc;        
+          'cccc,.             .cccc,          
+            .cccc;.  '::,.       .            
+              .cccc:cccccc;.                  
+                .ccccccccccc;                 
+                  .cccccccc.                  
+                     cccc.
