@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<title>snigdha os assistant</title>
+	<style>
+		.s0 { fill: #0000ff;stroke: #ffffff;paint-order:stroke fill markers;stroke-linejoin: round;stroke-width: 6 } 
+		.s1 { fill: #e54343;stroke: #ffffff;paint-order:stroke fill markers;stroke-linejoin: round;stroke-width: 6 } 
+	</style>
+	<path id="Layer" fill-rule="evenodd" class="s0" d="m219.5 353.2l36.3-36.3 36.3 36.3 36.2 36.3-72.5 72.5q-105.7-105.7-211.4-211.4 0-108.8 0-217.6l138.9 138.9-36.3 36.2-51.4-51.3v72.6z"/>
+	<path id="Layer" fill-rule="evenodd" class="s1" d="m328.3 171.9l138.9-138.9q0 108.8 0 217.6-51.4 51.4-102.6 102.6l-108.8-108.8-36.3 36.3-36.2-36.3 72.5-72.5 108.8 108.8 51.2-51.3v-72.6l-51.2 51.3z"/>
+</svg>
