@@ -1,1 +1,12 @@
 #!/bin/bash
+
+echo
+echo "Getting Fastest Mirror..."
+echo
+
+sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/mirrorlist arch
+sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/chaotic-mirrorlist chaotic-aur
+
+echo
+echo "Fastest mirrors have been set..."
+echo
