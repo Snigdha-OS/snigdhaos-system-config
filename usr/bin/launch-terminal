@@ -1,13 +1,16 @@
 #!/usr/bin/bash
 
+# Author: Garuda Linux
+# Adopted for Snigdha OS
+
 set -e
 
-EXEC_TERMINAL=bash
+LAUNCH_TERMINAL_SHELL=bash
 
 usage() {
 	echo "Usage: ${0##*/} [cmd]"
 	echo '    -s [shell]         Change shell to [shell]'
-	echo '    -h                 Show help'
+	echo '    -h                 This help'
 	exit 1
 }
 
@@ -15,10 +18,10 @@ opts='s:h'
 
 while getopts "${opts}" arg; do
 	case "${arg}" in
-	s) EXEC_TERMINAL="$OPTARG" ;;
+	s) LAUNCH_TERMINAL_SHELL="$OPTARG" ;;
 	h | ?) usage 0 ;;
 	*)
-		echo "Invalid Argument '${arg}'!"
+		echo "invalid argument '${arg}'"
 		usage 1
 		;;
 	esac
@@ -29,9 +32,9 @@ shift $(($OPTIND - 1))
 initfile="$(mktemp)"
 codefile="$initfile"
 echo "#!/usr/bin/env bash" >"$initfile"
-if [ "$EXEC_TERMINAL" != "bash" ]; then
+if [ "$LAUNCH_TERMINAL_SHELL" != "bash" ]; then
 	codefile="$(mktemp)"
-	echo "$EXEC_TERMINAL $codefile" >>"$initfile"
+	echo "$LAUNCH_TERMINAL_SHELL $codefile" >>"$initfile"
 fi
 echo "$1" >>"$codefile"
 chmod +x "$initfile"
@@ -73,7 +76,7 @@ if [ -z "$terminal" ] || ! command -v "$terminal" &>/dev/null; then
 fi
 
 if [ -z "$terminal" ]; then
-	notify-send -t 15000 --app-name=Snigdha\ OS "No terminal installed" "No supported terminal emulator is installed. Please install a terminal emulator like gnome-terminal."
+	notify-send -t 15000 --app-name=Garuda\ Linux "No terminal installed" "No supported terminal emulator is installed. Please install a terminal emulator like Alacritty."
 	exit 1
 fi
 
