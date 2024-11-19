@@ -1,10 +1,25 @@
 #!/bin/bash
 
+# Define the source and target files
+SOURCE_FILE="/usr/local/share/snigdhaos/release/lsb-release-snigdhaos"
+TARGET_FILE="/etc/lsb-release"
+
 echo
 echo "Applying lsb Release..."
-echo
 
-sudo cp /usr/local/share/snigdhaos/release/lsb-release-snigdhaos /etc/lsb-release
+# Check if the source file exists
+if [[ ! -f "$SOURCE_FILE" ]]; then
+    echo "Error: Source file '$SOURCE_FILE' does not exist."
+    exit 1
+fi
+
+# Attempt to copy the source file to the target location
+if sudo cp "$SOURCE_FILE" "$TARGET_FILE"; then
+    echo "Successfully copied $SOURCE_FILE to $TARGET_FILE."
+else
+    echo "Error: Failed to copy $SOURCE_FILE to $TARGET_FILE."
+    exit 1
+fi
 
 echo
 echo "Task Completed!"
