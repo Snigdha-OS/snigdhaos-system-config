@@ -1,72 +1,70 @@
 #!/bin/bash
 
-Online=0
-function check_connectivity() {
-    local test_ip
-    local test_count
+# Function to check internet connectivity
+check_connectivity() {
+    local test_ip="8.8.8.8"
+    local test_count=1
 
-    test_ip="8.8.8.8"
-    test_count=1
-
-    if ping -c ${test_count} ${test_ip} > /dev/null; then
-       	echo 
-       	echo "System Online!"
-       	echo
-       	Online=1
+    # Try to ping a known IP address to check if the system is online
+    if ping -c "$test_count" "$test_ip" > /dev/null 2>&1; then
+        echo -e "\nSystem is Online!\n"
+        Online=1
     else
-    	echo
-        echo "System Offline! Unable To Download snigdhaos-keyring!"
-       	echo
-       	Online=0
+        echo -e "\nSystem is Offline! Unable to download snigdhaos-keyring.\n"
+        Online=0
     fi
- }
+}
 
+# Run the connectivity check
 check_connectivity
 
-if [ $Online -eq 1 ] ; then
-	echo
-	echo "Installing snigdhaos-keyring..."
-	echo
-	sudo pacman -Sy snigdhaos-keyring --noconfirm
-	echo
+# Install snigdhaos-keyring if the system is online
+if [ "$Online" -eq 1 ]; then
+    echo -e "\nInstalling snigdhaos-keyring...\n"
+    if ! sudo pacman -Sy snigdhaos-keyring --noconfirm; then
+        echo -e "\nError: Failed to install snigdhaos-keyring.\n"
+        exit 1
+    fi
 fi
 
-echo
-echo "Removing prevoius pacman databases at /var/lib/pacman/sync/*"
-echo
-sudo rm /var/lib/pacman/sync/*
-echo
+# Clean up previous pacman sync databases
+echo -e "\nRemoving previous pacman databases at /var/lib/pacman/sync/*\n"
+if ! sudo rm -rf /var/lib/pacman/sync/*; then
+    echo -e "\nError: Failed to remove pacman sync databases.\n"
+    exit 1
+fi
 
-echo
-echo "Removing prevoius /etc/pacman.d/gnupg folder"
-echo
-sudo rm -rf /etc/pacman.d/gnupg/*
-echo
+# Remove previous GNUPG folder
+echo -e "\nRemoving previous /etc/pacman.d/gnupg folder\n"
+if ! sudo rm -rf /etc/pacman.d/gnupg/*; then
+    echo -e "\nError: Failed to remove pacman gnupg folder.\n"
+    exit 1
+fi
 
-echo
-echo "Initializing pacman keys..."
-echo
-sudo pacman-key --init
-echo
+# Initialize pacman keys
+echo -e "\nInitializing pacman keys...\n"
+if ! sudo pacman-key --init; then
+    echo -e "\nError: Failed to initialize pacman keys.\n"
+    exit 1
+fi
 
-echo
-echo "Populating keyring..."
-echo 
-sudo pacman-key --populate
-echo
+# Populate the keyring
+echo -e "\nPopulating keyring...\n"
+if ! sudo pacman-key --populate archlinux; then
+    echo -e "\nError: Failed to populate the keyring.\n"
+    exit 1
+fi
 
-echo
-echo "Adding Ubuntu keyserver..."
-echo 
-echo "
-keyserver hkp://keyserver.ubuntu.com:80" | sudo tee --append /etc/pacman.d/gnupg/gpg.conf
+# Add the Ubuntu keyserver for extra key fetching
+echo -e "\nAdding Ubuntu keyserver...\n"
+echo "keyserver hkp://keyserver.ubuntu.com:80" | sudo tee --append /etc/pacman.d/gnupg/gpg.conf > /dev/null
 
-echo
-echo "Synchronizing Database..."
-echo 
-sudo pacman -Sy
-echo
+# Synchronize the database
+echo -e "\nSynchronizing Database...\n"
+if ! sudo pacman -Sy; then
+    echo -e "\nError: Failed to synchronize pacman database.\n"
+    exit 1
+fi
 
-echo
-echo "Task Completed!"
-echo
+# Completion message
+echo -e "\nTask Completed!\n"
