@@ -1,48 +1,56 @@
 #!/bin/bash
 #set -e
 
-# Fix computers that have our old ordering
+echo
+echo "Checking and fixing microcode and mkinitcpio configuration..."
+echo
+
+# Ensure /etc/mkinitcpio.conf exists
+if [ ! -f /etc/mkinitcpio.conf ]; then
+    echo "Error: /etc/mkinitcpio.conf does not exist. Exiting."
+    exit 1
+fi
+
+# Fix old ordering (microcode before autodetect)
 if grep -q "base udev microcode autodetect" /etc/mkinitcpio.conf; then
-
-	echo 
-	echo "Adding microcode AFTER autodetect"
-	echo 
-	sudo sed -i "s/^HOOKS=(base udev microcode autodetect/HOOKS=(base udev autodetect microcode/g" /etc/mkinitcpio.conf;
-	sudo sed -i 's/^HOOKS="base udev microcode autodetect/HOOKS="base udev autodetect microcode/g' /etc/mkinitcpio.conf;
-fi
-
-
-# HOOKS=(base udev microcode autodetect kms modconf block keyboard keymap consolefont filesystems fsck)
-if grep -q "base udev autodetect microcode" /etc/mkinitcpio.conf; then
-	echo 
-	echo "Microcode is already in"
-	echo 
+    echo "Fixing microcode ordering: Moving microcode AFTER autodetect..."
+    sudo sed -i 's/^HOOKS=(base udev microcode autodetect/HOOKS=(base udev autodetect microcode/g' /etc/mkinitcpio.conf
+    sudo sed -i 's/^HOOKS="base udev microcode autodetect/HOOKS="base udev autodetect microcode/g' /etc/mkinitcpio.conf
 else
-	#sudo sed -i "s/HOOKS=(base udev autodetect kms /HOOKS=(base udev microcode autodetect kms /g" /etc/mkinitcpio.conf;
-	echo 
-	echo "Adding microcode after autodetect"
-	echo 
-	sudo sed -i "s/^HOOKS=(base udev autodetect/HOOKS=(base udev autodetect microcode/g" /etc/mkinitcpio.conf;
-	sudo sed -i 's/^HOOKS="base udev autodetect/HOOKS="base udev autodetect microcode/g' /etc/mkinitcpio.conf;
+    echo "Microcode is already in the correct position."
 fi
+
+# Ensure microcode is included after autodetect if not present
+if ! grep -q "base udev autodetect microcode" /etc/mkinitcpio.conf; then
+    echo "Adding microcode after autodetect in mkinitcpio.conf..."
+    sudo sed -i 's/^HOOKS=(base udev autodetect/HOOKS=(base udev autodetect microcode/g' /etc/mkinitcpio.conf
+    sudo sed -i 's/^HOOKS="base udev autodetect/HOOKS="base udev autodetect microcode/g' /etc/mkinitcpio.conf
+else
+    echo "Microcode is already present in the correct position."
+fi
+
+# Detect CPU vendor (Intel or AMD)
+cpu=$(awk -F: '/vendor_id/ {print $2}' /proc/cpuinfo | uniq | tr -d ' ')
 
 echo
-echo 
-echo "Installing the correct microcode - intel or amd"
-echo 
-cpu=$(cat /proc/cpuinfo | grep vendor_id | uniq | awk '{print $3}')
-echo "We are installing the package for this cpu: "$cpu
-echo 
+echo "Detected CPU vendor: $cpu"
+echo "Installing appropriate microcode package..."
 
-if [ $cpu == "GenuineIntel" ]; then
-	sudo pacman -S --noconfirm intel-ucode
+# Install the correct microcode package
+if [ "$cpu" == "GenuineIntel" ]; then
+    sudo pacman -S --noconfirm intel-ucode
+elif [ "$cpu" == "AuthenticAMD" ]; then
+    sudo pacman -S --noconfirm amd-ucode
 else
-	sudo pacman -S --noconfirm amd-ucode
+    echo "Warning: Unknown CPU vendor ($cpu). Skipping microcode installation."
 fi
 
+# Regenerate initramfs
+echo "Regenerating initramfs with mkinitcpio..."
 sudo mkinitcpio -P
 
+# Completion message
 echo
-echo 
-echo "###                DONE - YOU CAN CLOSE THIS WINDOW                        ####"
-echo 
+echo "Microcode setup complete and initramfs regenerated."
+echo "You can now reboot your system."
+
