@@ -1,9 +1,30 @@
 #!/bin/bash
 
-boot=$(bootctl status | grep Product | awk '{printf($2)}')
+# Get the current bootloader from bootctl status
+boot=$(bootctl status | grep -i 'Product' | awk '{printf($2)}')
+
+# Check if the bootloader is GRUB
 echo "The system is using $boot to boot."
 
-# shellcheck disable=SC2086
-if [ $boot = "GRUB" ]; then
-	/usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos --disable-shim-lock --removable
+# Check if the bootloader is GRUB and install it if necessary
+if [[ "$boot" == "GRUB" ]]; then
+    echo "GRUB bootloader detected. Installing or reconfiguring GRUB..."
+
+    # Ensure grub-install exists and is executable
+    if ! command -v /usr/bin/grub-install &> /dev/null; then
+        echo "Error: grub-install command not found. Please install GRUB."
+        exit 1
+    fi
+
+    # Execute the grub-install command
+    sudo /usr/bin/grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos --disable-shim-lock --removable
+
+    if [[ $? -eq 0 ]]; then
+        echo "GRUB installation successful."
+    else
+        echo "Error: GRUB installation failed."
+        exit 1
+    fi
+else
+    echo "The system is not using GRUB as the bootloader. No action taken."
 fi
