@@ -1,1 +1,44 @@
 #!/bin/bash
+
+# Function to check internet connectivity
+check_connectivity() {
+    local test_ip="8.8.8.8"
+    if ping -c 1 "$test_ip" &> /dev/null; then
+        echo "System Online! Proceeding with installation."
+    else
+        echo "Error: No internet connection. Please check your connection and try again."
+        exit 1
+    fi
+}
+
+# Function to check if the package is already installed
+check_package_installed() {
+    if pacman -Q hw-probe &> /dev/null; then
+        echo "hw-probe is already installed."
+        exit 0
+    fi
+}
+
+echo
+echo "Checking internet connectivity..."
+check_connectivity
+
+echo
+echo "Checking if hw-probe is already installed..."
+check_package_installed
+
+echo
+echo "Installing hw-probe..."
+echo
+
+# Install the package
+if sudo pacman -S --noconfirm --needed hw-probe; then
+    echo "hw-probe has been installed successfully!"
+else
+    echo "Error: Failed to install hw-probe. Please check the output above."
+    exit 1
+fi
+
+echo
+echo "Task Completed!"
+echo
