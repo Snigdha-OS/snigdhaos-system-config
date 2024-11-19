@@ -1,12 +1,33 @@
 #!/bin/bash
 
+# Define function to check if rate-mirrors is installed
+check_dependencies() {
+    if ! command -v /usr/bin/rate-mirrors &>/dev/null; then
+        echo "Error: rate-mirrors is not installed. Please install it first."
+        exit 1
+    fi
+}
+
+# Check for rate-mirrors dependency
+check_dependencies
+
 echo
 echo "Getting Fastest Mirror..."
 echo
 
-sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/mirrorlist arch
-sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/chaotic-mirrorlist chaotic-aur
+# Run rate-mirrors for the Arch and Chaotic-AUR repositories
+echo "Finding fastest mirrors for Arch..."
+if ! sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/mirrorlist arch; then
+    echo "Error: Failed to update the Arch mirrorlist."
+    exit 1
+fi
+
+echo "Finding fastest mirrors for Chaotic-AUR..."
+if ! sudo /usr/bin/rate-mirrors --concurrency 40 --disable-comments --allow-root --save /etc/pacman.d/chaotic-mirrorlist chaotic-aur; then
+    echo "Error: Failed to update the Chaotic-AUR mirrorlist."
+    exit 1
+fi
 
 echo
-echo "Fastest mirrors have been set..."
+echo "Fastest mirrors have been set for both Arch and Chaotic-AUR."
 echo
