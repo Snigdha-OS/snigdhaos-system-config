@@ -5,7 +5,7 @@
 
 set -euo pipefail  # Enable strict error handling
 
-LAUNCH_TERMINAL_SHELL=bash
+LAUNCH_TERMINAL_SHELL="bash"
 
 usage() {
     echo "Usage: ${0##*/} [options] [command]"
@@ -20,35 +20,50 @@ usage() {
     exit 1
 }
 
-opts='s:h'
-
+# Parse options
+opts="s:h"
 while getopts "${opts}" arg; do
     case "${arg}" in
         s) LAUNCH_TERMINAL_SHELL="$OPTARG" ;;
-        h | ?) usage 0 ;;
+        h) usage ;;
+        ?) usage ;;
         *)
-            echo "invalid argument '${arg}'"
-            usage 1
+            echo "Invalid option: ${arg}"
+            usage
             ;;
     esac
 done
 
-shift $(($OPTIND - 1))
+# Shift away the processed options
+shift $((OPTIND - 1))
 
+# Check if a command was passed
+if [ $# -eq 0 ]; then
+    echo "Error: No command provided."
+    usage
+fi
+
+# Create temporary files for the shell scripts
 initfile=$(mktemp)
 codefile=$initfile
 
+# Generate the initial shell script
 echo "#!/usr/bin/env bash" > "$initfile"
 
+# If user has specified a shell, set it in the code
 if [ "$LAUNCH_TERMINAL_SHELL" != "bash" ]; then
     codefile=$(mktemp)
     echo "$LAUNCH_TERMINAL_SHELL $codefile" >> "$initfile"
 fi
 
+# Write the user's command to the code file
 echo "$1" >> "$codefile"
 chmod +x "$initfile"
+
+# Command to run in the terminal emulator
 cmd="\"$initfile\""
 
+# Define a dictionary of supported terminal emulators
 declare -A terminals=(
     ["alacritty"]="alacritty -e $cmd || LIBGL_ALWAYS_SOFTWARE=1 alacritty -e $cmd"
     ["konsole"]="konsole -e $cmd"
@@ -62,52 +77,59 @@ declare -A terminals=(
     ["foot"]="foot -T launch-terminal -e $cmd"
 )
 
+# Define an ordered list of terminals to try
 declare -a term_order=(
     "alacritty" "konsole" "kgx" "gnome-terminal" "mate-terminal"
     "xfce4-terminal" "qterminal" "lxterminal" "xterm" "foot"
 )
 
+# Select the terminal based on the desktop environment
 case "$XDG_CURRENT_DESKTOP" in
-    KDE) terminal=konsole ;;
+    KDE) terminal="konsole" ;;
     GNOME)
         if command -v "kgx" &> /dev/null; then
-            terminal=kgx
+            terminal="kgx"
         else
-            terminal=gnome-terminal
+            terminal="gnome-terminal"
         fi
         ;;
-    XFCE) terminal=xfce4-terminal ;;
-    LXQt) terminal=qterminal ;;
-    MATE) terminal=mate-terminal ;;
+    XFCE) terminal="xfce4-terminal" ;;
+    LXQt) terminal="qterminal" ;;
+    MATE) terminal="mate-terminal" ;;
     *)
         for i in "${term_order[@]}"; do
             if command -v "$i" &> /dev/null; then
-                terminal=$i
+                terminal="$i"
                 break
             fi
         done
         ;;
 esac
 
+# If no terminal emulator is found, notify and exit
 if [ -z "$terminal" ]; then
-    notify-send -t 15000 --app-name=Snigdha\ OS "No terminal installed" "No supported terminal emulator is installed. Please install a terminal emulator like Alacritty."
+    notify-send -t 15000 --app-name=Snigdha\ OS "No terminal installed" \
+        "No supported terminal emulator is installed. Please install a terminal emulator like Alacritty."
     exit 1
 fi
 
+# Special handling for kgx to ensure proper behavior
 if [ "$terminal" = "kgx" ]; then
     sed -i '2i sleep 0.1' "$initfile"
     echo 'kill -SIGINT $PPID' >> "$initfile"
 fi
 
-eval "${terminals[$terminal]}" || {
-    exitcode=$?
-}
+# Run the terminal emulator with the command
+eval "${terminals[$terminal]}" || exitcode=$?
 
+# Clean up temporary files
 rm "$initfile"
 if [ "$codefile" != "$initfile" ]; then
     rm "$codefile"
 fi
 
-if [ -n "$exitcode" ] && [ "$exitcode" != 130 ]; then
+# Exit gracefully if no terminal error occurred, otherwise propagate the error
+if [ -n "${exitcode-}" ] && [ "$exitcode" != 130 ]; then
+    echo "Error: Terminal launch failed with exit code $exitcode"
     exit 2
 fi
