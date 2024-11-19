@@ -3,7 +3,7 @@
 # Author: Garuda Linux
 # Adopted for Snigdha OS
 
-set -e
+set -euo pipefail  # Enable strict error handling
 
 LAUNCH_TERMINAL_SHELL=bash
 
