@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Author: Eshan Roy <m.eshanized@
+# Author: Eshan Roy <m.eshanized@gmail.com>
 # Description: This script configures GitHub user email and username.
 
 set -e
