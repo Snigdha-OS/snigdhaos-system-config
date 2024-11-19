@@ -5,23 +5,31 @@ echo "Copying /etc/pacman.d/gnupg/gpg.conf"
 echo
 
 file_boolean=0
-function check_file() {
+file="/usr/local/share/snigdhaos/gpg.conf"
 
-	file="/usr/local/share/snigdhaos/gpg.conf"
-	if [[ -f $file ]];then
-    	echo $file " exists"
-    	file_boolean=1
-	else
-    	echo $file " doesn't exist"
-    	file_boolean=0
-	fi
+# Function to check if the specified file exists
+check_file() {
+    if [[ -f "$file" ]]; then
+        echo "$file exists"
+        file_boolean=1
+    else
+        echo "$file doesn't exist"
+        file_boolean=0
+    fi
 }
 
+# Run the file existence check
 check_file
 
-if [ $file_boolean -eq 1 ] ; then
-	sudo cp /usr/local/share/snigdhaos/gpg.conf /etc/pacman.d/gnupg/gpg.conf
-	echo "/etc/pacman.d/gnupg/gpg.conf copied from local system"
+# If the file exists, copy it to the appropriate location
+if [ "$file_boolean" -eq 1 ]; then
+    echo -e "\nCopying $file to /etc/pacman.d/gnupg/gpg.conf"
+    if sudo cp "$file" /etc/pacman.d/gnupg/gpg.conf; then
+        echo "/etc/pacman.d/gnupg/gpg.conf copied from local system successfully."
+    else
+        echo "Error: Failed to copy $file to /etc/pacman.d/gnupg/gpg.conf"
+        exit 1
+    fi
 fi
 
 echo
