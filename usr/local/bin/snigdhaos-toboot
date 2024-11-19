@@ -1,29 +1,54 @@
 #!/bin/bash
 
-if lsblk | grep -q "/boot/efi" ; then
-	echo
-	echo "Reinstalling systemd-boot..."
-	echo
+# Check if /boot/efi exists and is a valid EFI partition
+if lsblk | grep -q "/boot/efi"; then
+    echo
+    echo "Reinstalling systemd-boot..."
+    echo
 
-	sudo pacman -S --noconfirm kernel-install-mkinitcpio
-	sudo bootctl install
-	sudo reinstall-kernels
+    # Check if necessary tools are installed
+    if ! command -v bootctl &>/dev/null; then
+        echo "Error: bootctl is not installed. Please install systemd-boot first."
+        exit 1
+    fi
 
-	if [[ -f /boot/efi/loader/loader.conf ]];then
-		sudo sed -i "s/#timeout 3/timeout 3/g" /boot/efi/loader/loader.conf
-	fi
+    if ! pacman -Q kernel-install-mkinitcpio &>/dev/null; then
+        echo "Error: kernel-install-mkinitcpio package is not installed."
+        exit 1
+    fi
 
-	if [[ -f /boot/efi/loader/loader.conf ]];then
-		sudo sed -i "s/#console-mode keep/console-mode keep/g" /boot/efi/loader/loader.conf
-	fi
+    # Install or reinstall systemd-boot related packages
+    sudo pacman -S --noconfirm kernel-install-mkinitcpio
+    sudo bootctl install
+    sudo reinstall-kernels
 
-	echo
-	echo "Task Completed!"
-	echo
+    # Check if loader.conf exists, then adjust settings
+    loader_conf="/boot/efi/loader/loader.conf"
+    if [[ -f "$loader_conf" ]]; then
+        echo "Modifying $loader_conf..."
+
+        # Backup loader.conf before modifying
+        sudo cp "$loader_conf" "$loader_conf.bak"
+
+        # Modify loader.conf
+        sudo sed -i "s/#timeout 3/timeout 3/" "$loader_conf"
+        sudo sed -i "s/#console-mode keep/console-mode keep/" "$loader_conf"
+
+        echo "Systemd-boot loader configuration updated."
+    else
+        echo "Error: $loader_conf not found. Unable to modify loader configuration."
+        exit 1
+    fi
+
+    echo
+    echo "Task Completed!"
+    echo
 
 else
-	echo
-	echo "Task Falied!"
-	echo "More on: https://wiki.archlinux.org/title/Arch_boot_process"
-	echo
+    echo
+    echo "Task Failed!"
+    echo "No /boot/efi partition found. Please ensure you are using UEFI mode."
+    echo "More on: https://wiki.archlinux.org/title/Arch_boot_process"
+    echo
+    exit 1
 fi
