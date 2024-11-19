@@ -1,56 +1,71 @@
 #!/bin/bash
 
+# Reinstall pacman.conf, downloading it if online or using a local copy if offline.
+
 echo
 echo "Downloading Latest pacman.conf..."
 echo
 
+# Define the working directory (ensure it's set)
+workdir="${workdir:-/tmp}"  # Default to /tmp if $workdir is not set
+
 Online=0
 file_boolean=0
 
-function check_connectivity() {
-    local test_ip
-    local test_count
+# Function to check if the system has network connectivity
+check_connectivity() {
+    local test_ip="8.8.8.8"
+    local test_count=1
 
-    test_ip="8.8.8.8"
-    test_count=1
-
-    if ping -c ${test_count} ${test_ip} > /dev/null; then
-       echo "System Online!"
-       Online=1
+    # Try to ping the test IP
+    if ping -c "$test_count" "$test_ip" > /dev/null 2>&1; then
+        echo "System is Online!"
+        Online=1
     else
-       echo "System Offline!"
-       Online=0
+        echo "System is Offline!"
+        Online=0
     fi
- }
-
-function check_file() {
-	file="/usr/local/share/snigdhaos/pacman.conf"
-	if [[ -f $file ]];then
-    	echo $file " Found."
-    	file_boolean=1
-	else
-    	echo $file " Not Found!"
-    	file_boolean=0
-	fi
 }
 
+# Function to check if the required pacman.conf file exists locally
+check_file() {
+    local file="/usr/local/share/snigdhaos/pacman.conf"
+    if [[ -f "$file" ]]; then
+        echo "$file Found."
+        file_boolean=1
+    else
+        echo "$file Not Found!"
+        file_boolean=0
+    fi
+}
+
+# Check connectivity and file existence
 check_connectivity
 check_file
 
-if [ $Online -eq 1 ] ; then
-	echo "Downloading pacman.conf..."
-	# shellcheck disable=SC2154
-	# shellcheck disable=SC2086
-	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/pacman.conf -O $workdir/etc/pacman.conf
+# If the system is online, download the latest pacman.conf
+if [ "$Online" -eq 1 ]; then
+    echo "Downloading pacman.conf..."
+    if ! sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/pacman.conf -O "$workdir/etc/pacman.conf"; then
+        echo "Error: Failed to download pacman.conf!"
+        exit 1
+    fi
 fi
 
-if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
-	sudo cp /usr/local/share/snigdhaos/pacman.conf /etc/pacman.conf
-	echo "Copied pacman.conf..."
+# If the system is offline and the local pacman.conf file exists, copy it
+if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 1 ]; then
+    echo "Copying local pacman.conf..."
+    if ! sudo cp /usr/local/share/snigdhaos/pacman.conf /etc/pacman.conf; then
+        echo "Error: Failed to copy pacman.conf!"
+        exit 1
+    fi
+    echo "pacman.conf copied successfully!"
 fi
 
-if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
-	echo "Run this script once you are back online!"
+# If offline and the file does not exist locally, notify the user
+if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 0 ]; then
+    echo "Run this script once you are back online!"
+    exit 1
 fi
 
 echo
