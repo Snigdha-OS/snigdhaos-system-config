@@ -1,59 +1,79 @@
 #!/bin/bash
 
+# Reinstalling GRUB with online check and local fallback mechanism.
+
 echo
 echo "Reinstalling Grub..."
 echo
 
+# Define the working directory for storing temporary files (ensure it's set).
+workdir="${workdir:-/tmp}"  # Default to /tmp if $workdir is not set.
+
 Online=0
 file_boolean=0
 
-function check_connectivity() {
-    local test_ip
-    local test_count
+# Function to check if the system has network connectivity
+check_connectivity() {
+    local test_ip="8.8.8.8"
+    local test_count=1
 
-    test_ip="8.8.8.8"
-    test_count=1
-
-    if ping -c ${test_count} ${test_ip} > /dev/null; then
-       echo "System Online."
-       Online=1
+    if ping -c "$test_count" "$test_ip" > /dev/null 2>&1; then
+        echo "System is Online."
+        Online=1
     else
-       echo "System Offline!"
-       Online=0
+        echo "System is Offline!"
+        Online=0
     fi
- }
-
-function check_file() {
-	file="/usr/local/share/snigdhaos/grub/grub"
-	if [[ -f $file ]];then
-    	echo $file " exists"
-    	file_boolean=1
-	else
-    	echo $file " doesn't exist"
-    	file_boolean=0
-	fi
 }
 
+# Function to check if the required file exists locally
+check_file() {
+    local file="/usr/local/share/snigdhaos/grub/grub"
+    if [[ -f "$file" ]]; then
+        echo "$file exists."
+        file_boolean=1
+    else
+        echo "$file doesn't exist."
+        file_boolean=0
+    fi
+}
+
+# Check system connectivity and file existence
 check_connectivity
 check_file
 
-if [ $Online -eq 1 ] ; then
-	echo "Downloading Default Grub..."
-	# shellcheck disable=SC2154
-	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir"/etc/default/grub
+# Handle online situation: download the default grub config if online
+if [ "$Online" -eq 1 ]; then
+    echo "Downloading Default Grub..."
+    if ! sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir/etc/default/grub"; then
+        echo "Failed to download the default grub file!"
+        exit 1
+    fi
 fi
 
-if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
-	sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
-	echo "Copied Grub Locally!"
+# Handle offline situation: use local grub file if available
+if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 1 ]; then
+    echo "Copying local Grub config..."
+    if ! sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub; then
+        echo "Failed to copy the local grub file!"
+        exit 1
+    fi
+    echo "Local Grub config copied!"
 fi
 
-if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
-	echo "Run this script once you are back online"
+# Handle offline situation with missing local file: notify user
+if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 0 ]; then
+    echo "Run this script once you are back online."
+    exit 1
 fi
 
-sudo grub-mkconfig -o /boot/grub/grub.cfg
+# Regenerate the grub configuration
+echo "Regenerating Grub configuration..."
+if ! sudo grub-mkconfig -o /boot/grub/grub.cfg; then
+    echo "Failed to regenerate Grub configuration!"
+    exit 1
+fi
 
 echo
 echo "Task Completed!"
-echo 
+echo
