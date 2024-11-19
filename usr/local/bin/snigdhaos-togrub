@@ -1,68 +1,99 @@
 #!/bin/bash
 
 echo
-echo "Reinstalling Grub..."
+echo "Reinstalling GRUB..."
 echo
 
+# Initializing variables
 Online=0
 file_boolean=0
+workdir="/tmp"
 
+# Check system connectivity
 function check_connectivity() {
-    local test_ip
-    local test_count
-
-    test_ip="8.8.8.8"
-    test_count=1
+    local test_ip="8.8.8.8"
+    local test_count=1
 
     if ping -c ${test_count} ${test_ip} > /dev/null; then
-       echo "System Online!"
-       Online=1
+        echo "System Online!"
+        Online=1
     else
-       echo "System Offline!"
-       Online=0
+        echo "System Offline!"
+        Online=0
     fi
- }
-
-function check_file() {
-	file="/usr/local/share/snigdhaos/grub/grub"
-	if [[ -f $file ]];then
-    	echo $file " Found."
-    	file_boolean=1
-	else
-    	echo $file " Not Found!"
-    	file_boolean=0
-	fi
 }
 
+# Check if the custom GRUB file exists
+function check_file() {
+    local file="/usr/local/share/snigdhaos/grub/grub"
+    if [[ -f "$file" ]]; then
+        echo "$file Found."
+        file_boolean=1
+    else
+        echo "$file Not Found!"
+        file_boolean=0
+    fi
+}
+
+# Check connectivity and file existence
 check_connectivity
 check_file
 
-if [ $Online -eq 1 ] ; then
-	echo "getting latest /etc/default/grub from github"
-	# shellcheck disable=SC2086
-	# shellcheck disable=SC2154
-	sudo wget https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O $workdir/etc/default/grub
+# If online, download the latest grub file
+if [ $Online -eq 1 ]; then
+    echo "Getting latest /etc/default/grub from GitHub..."
+    # Ensure the workdir exists
+    mkdir -p "$workdir/etc"
+    # Download the GRUB config
+    sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir/etc/default/grub"
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to download the GRUB configuration."
+        exit 1
+    fi
 fi
 
-if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ] ; then
-	sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
-	echo "Copied Grub From System!"
+# If offline, copy the local GRUB file
+if [ $Online -eq 0 ] && [ $file_boolean -eq 1 ]; then
+    sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub
+    echo "Copied GRUB configuration from the system!"
 fi
 
-if [ $Online -eq 0 ]  && [ $file_boolean -eq 0 ] ; then
-	echo "Run this script once you are back online"
+# If offline and the file doesn't exist, exit with a message
+if [ $Online -eq 0 ] && [ $file_boolean -eq 0 ]; then
+    echo "Run this script once you are back online"
+    exit 1
 fi
 
+# Remove the old kernel install package (if needed)
+echo
+echo "Removing old kernel-install-mkinitcpio..."
 sudo pacman -R --noconfirm kernel-install-mkinitcpio
 
-echo
-echo "Updating your /boot/grub/grub.cfg to apply the grub default file..."
-echo
+# Ensure that /boot/efi is mounted (required for GRUB installation)
+if ! mount | grep -q "/boot/efi"; then
+    echo "Error: /boot/efi is not mounted. Please mount it and try again."
+    exit 1
+fi
 
-sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos
+# Reinstall GRUB bootloader
+echo
+echo "Reinstalling GRUB bootloader..."
+sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=snigdhaos --removable
+if [[ $? -ne 0 ]]; then
+    echo "Error: GRUB installation failed."
+    exit 1
+fi
 
+# Update GRUB configuration
+echo
+echo "Updating /boot/grub/grub.cfg..."
 sudo grub-mkconfig -o /boot/grub/grub.cfg
+if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update grub.cfg."
+    exit 1
+fi
 
+# Final message
 echo
-echo "Make sure you installed snigdhaos-grub-theme"
-echo
+echo "GRUB reinstallation complete!"
+echo "Make sure you have installed snigdhaos-grub-theme."
