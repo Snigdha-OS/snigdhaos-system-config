@@ -8,9 +8,15 @@ set -euo pipefail  # Enable strict error handling
 LAUNCH_TERMINAL_SHELL=bash
 
 usage() {
-    echo "Usage: ${0##*/} [cmd]"
-    echo '    -s [shell]         Change shell to [shell]'
-    echo '    -h                 This help'
+    echo "Usage: ${0##*/} [options] [command]"
+    echo
+    echo "Options:"
+    echo "    -s [shell]         Change shell to [shell] (default: bash)"
+    echo "    -h                 Show this help message"
+    echo
+    echo "Example:"
+    echo "    ${0##*/} -s zsh 'echo Hello, World!'"
+    echo "    ${0##*/} -h"
     exit 1
 }
 
