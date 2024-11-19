@@ -1,36 +1,42 @@
 #!/bin/bash
 
+# Ask the user whether to copy contents from /etc/skel to the Home directory
 echo "Copy contents from /etc/skel to Home directory? (Y/n)"
-# shellcheck disable=SC2162
-read response
+read -r response
 
+# Check if the user agrees (Y or y)
 if [[ "$response" == [yY] ]]; then
+    # Get current date and time to append to backup folder name
+    time=$(date +%Y.%m.%d-%H.%M.%S)
 
-	time=$(date +%Y.%m.%d-%H.%M.%S)
-	if [ ! -d ~/.config ]; then
-		mkdir ~/.config
-	fi
-	echo
-	# shellcheck disable=SC2086
-	echo "Backing up .config folder to ~/.config-backup-"$time
-	echo
+    # Ensure the ~/.config directory exists, if not, create it
+    if [ ! -d "$HOME/.config" ]; then
+        mkdir -p "$HOME/.config"
+    fi
 
-	# shellcheck disable=SC2086
-	cp -Rf ~/.config ~/.config-backup-$time
+    echo
+    # Notify user about the backup of .config folder
+    echo "Backing up .config folder to $HOME/.config-backup-$time"
+    echo
 
-	echo
-	echo "Overwriting existing .config folder with the files from /etc/skel"
-	echo
+    # Backup the current .config folder with a timestamped name
+    cp -Rf "$HOME/.config" "$HOME/.config-backup-$time"
 
-	# shellcheck disable=SC2086
-	cp -r /etc/skel/. $HOME
+    echo
+    # Inform the user that the .config folder will be overwritten
+    echo "Overwriting existing .config folder with files from /etc/skel"
+    echo
 
-	echo
-	echo "Task Completed!"
-	echo
+    # Copy the contents of /etc/skel to the user's home directory
+    cp -r /etc/skel/. "$HOME"
+
+    echo
+    echo "Task Completed!"
+    echo
 
 else
-  	echo
-  	echo "No change!"
-  	echo
+    # User chose not to make any changes
+    echo
+    echo "No change made!"
+    echo
 fi
