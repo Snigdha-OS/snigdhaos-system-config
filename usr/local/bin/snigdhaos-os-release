@@ -1,11 +1,40 @@
 #!/bin/bash
 
+# Define the source and target files
+SOURCE_FILE="/usr/local/share/snigdhaos/release/os-release-snigdhaos"
+TARGET_FILE_1="/usr/lib/os-release"
+TARGET_FILE_2="/usr/lib/os-release-snigdhaos"
+
 echo
 echo "Applying OS Release..."
-echo
 
-sudo cp /usr/local/share/snigdhaos/release/os-release-snigdhaos /usr/lib/os-release
-sudo cp /usr/local/share/snigdhaos/release/os-release-snigdhaos /usr/lib/os-release-snigdhaos
+# Check if the source file exists
+if [[ ! -f "$SOURCE_FILE" ]]; then
+    echo "Error: Source file '$SOURCE_FILE' does not exist."
+    exit 1
+fi
+
+# Backup existing files before overwriting (optional)
+echo "Backing up existing os-release files..."
+sudo cp "$TARGET_FILE_1" "$TARGET_FILE_1.bak" 2>/dev/null
+sudo cp "$TARGET_FILE_2" "$TARGET_FILE_2.bak" 2>/dev/null
+
+# Copy the source file to the target locations
+echo "Copying $SOURCE_FILE to $TARGET_FILE_1..."
+if sudo cp "$SOURCE_FILE" "$TARGET_FILE_1"; then
+    echo "Successfully copied to $TARGET_FILE_1."
+else
+    echo "Error: Failed to copy $SOURCE_FILE to $TARGET_FILE_1."
+    exit 1
+fi
+
+echo "Copying $SOURCE_FILE to $TARGET_FILE_2..."
+if sudo cp "$SOURCE_FILE" "$TARGET_FILE_2"; then
+    echo "Successfully copied to $TARGET_FILE_2."
+else
+    echo "Error: Failed to copy $SOURCE_FILE to $TARGET_FILE_2."
+    exit 1
+fi
 
 echo
 echo "Task Completed!"
