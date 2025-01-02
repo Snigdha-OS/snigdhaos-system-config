@@ -3,10 +3,11 @@
 # Author: Garuda Linux
 # Adopted for Snigdha OS
 
-set -euo pipefail  # Enable strict error handling
+set -euo pipefail  # Enable strict error handling to ensure errors are caught
 
-LAUNCH_TERMINAL_SHELL="bash"
+LAUNCH_TERMINAL_SHELL="bash"  # Default shell to launch in the terminal
 
+# Usage function to display how the script is used
 usage() {
     echo "Usage: ${0##*/} [options] [command]"
     echo
@@ -17,16 +18,16 @@ usage() {
     echo "Example:"
     echo "    ${0##*/} -s zsh 'echo Hello, World!'"
     echo "    ${0##*/} -h"
-    exit 1
+    exit 1  # Exit after displaying the usage information
 }
 
-# Parse options
-opts="s:h"
-while getopts "${opts}" arg; do
+# Parse options and arguments
+opts="s:h"  # Define the options we expect
+while getopts "${opts}" arg; do  # Loop through each option provided
     case "${arg}" in
-        s) LAUNCH_TERMINAL_SHELL="$OPTARG" ;;
-        h) usage ;;
-        ?) usage ;;
+        s) LAUNCH_TERMINAL_SHELL="$OPTARG" ;;  # Set the shell if provided with -s
+        h) usage ;;  # Show usage if -h is provided
+        ?) usage ;;  # Catch any invalid options and show usage
         *)
             echo "Invalid option: ${arg}"
             usage
@@ -34,36 +35,36 @@ while getopts "${opts}" arg; do
     esac
 done
 
-# Shift away the processed options
+# Shift away the processed options, leaving only the command
 shift $((OPTIND - 1))
 
-# Check if a command was passed
+# Ensure a command is provided
 if [ $# -eq 0 ]; then
     echo "Error: No command provided."
-    usage
+    usage  # Show usage if no command is provided
 fi
 
-# Create temporary files for the shell scripts
-initfile=$(mktemp)
-codefile=$initfile
+# Create temporary files to store shell scripts
+initfile=$(mktemp)  # Temp file to store the initialization script
+codefile=$initfile  # Initially, set codefile to the initfile
 
 # Generate the initial shell script
-echo "#!/usr/bin/env bash" > "$initfile"
+echo "#!/usr/bin/env bash" > "$initfile"  # Start the script with bash
 
-# If user has specified a shell, set it in the code
+# If the user specifies a shell, use it instead of bash
 if [ "$LAUNCH_TERMINAL_SHELL" != "bash" ]; then
-    codefile=$(mktemp)
-    echo "$LAUNCH_TERMINAL_SHELL $codefile" >> "$initfile"
+    codefile=$(mktemp)  # Create another temp file for the specified shell
+    echo "$LAUNCH_TERMINAL_SHELL $codefile" >> "$initfile"  # Add shell command to initfile
 fi
 
-# Write the user's command to the code file
-echo "$1" >> "$codefile"
-chmod +x "$initfile"
+# Write the user's command into the code file
+echo "$1" >> "$codefile"  # Add the user command to the code file
+chmod +x "$initfile"  # Make the initfile executable
 
-# Command to run in the terminal emulator
+# Define the command that will be run in the terminal
 cmd="$initfile"
 
-# Define a dictionary of supported terminal emulators
+# Define a dictionary of supported terminal emulators and their commands
 declare -A terminals=(
     ["alacritty"]="alacritty -e bash -c \"$cmd\" || LIBGL_ALWAYS_SOFTWARE=1 alacritty -e bash -c \"$cmd\""
     ["konsole"]="konsole --noclose -e bash -c \"$cmd\""
@@ -86,21 +87,21 @@ declare -a term_order=(
 # Select the terminal based on the desktop environment
 terminal=""
 case "$XDG_CURRENT_DESKTOP" in
-    KDE) terminal="konsole" ;;
+    KDE) terminal="konsole" ;;  # If in KDE, try Konsole
     GNOME)
         if command -v "kgx" &> /dev/null; then
-            terminal="kgx"
+            terminal="kgx"  # If KGX is available, use it for GNOME
         else
-            terminal="gnome-terminal"
+            terminal="gnome-terminal"  # Fallback to gnome-terminal if KGX is not available
         fi
         ;;
-    XFCE) terminal="xfce4-terminal" ;;
-    LXQt) terminal="qterminal" ;;
-    MATE) terminal="mate-terminal" ;;
+    XFCE) terminal="xfce4-terminal" ;;  # If in XFCE, use xfce4-terminal
+    LXQt) terminal="qterminal" ;;  # For LXQt, use qterminal
+    MATE) terminal="mate-terminal" ;;  # For MATE, use mate-terminal
     *)
         for i in "${term_order[@]}"; do
             if command -v "$i" &> /dev/null; then
-                terminal="$i"
+                terminal="$i"  # Try to find any terminal from the list
                 break
             fi
         done
@@ -111,33 +112,33 @@ esac
 if [ -z "$terminal" ]; then
     notify-send -t 15000 --app-name="Snigdha OS" "No terminal installed" \
         "No supported terminal emulator is installed. Please install a terminal emulator like Alacritty."
-    exit 1
+    exit 1  # Exit if no terminal is found
 fi
 
-# Debugging information
+# Debugging information: Display selected terminal and command
 echo "Selected terminal: $terminal"
 echo "Command to execute: ${terminals[$terminal]}"
 
 # Special handling for kgx to ensure proper behavior
 if [ "$terminal" = "kgx" ]; then
-    sed -i '2i sleep 0.1' "$initfile"
-    echo 'kill -SIGINT $PPID' >> "$initfile"
+    sed -i '2i sleep 0.1' "$initfile"  # Add a small sleep to avoid issues
+    echo 'kill -SIGINT $PPID' >> "$initfile"  # Send SIGINT to the parent process to close KGX
 fi
 
-# Run the terminal emulator with the command
-exitcode=0
-eval "${terminals[$terminal]}" || exitcode=$?
+# Run the selected terminal with the command
+exitcode=0  # Default exit code
+eval "${terminals[$terminal]}" || exitcode=$?  # Run the terminal command and capture exit code
 
 # Clean up temporary files
-rm "$initfile"
+rm "$initfile"  # Remove the initial script
 if [ "$codefile" != "$initfile" ]; then
-    rm "$codefile"
+    rm "$codefile"  # Remove the code file if it's different from the initfile
 fi
 
 # Exit handling
 if [ "$exitcode" -eq 0 ]; then
-    echo "Terminal executed the command successfully."
+    echo "Terminal executed the command successfully."  # Inform user of success
 elif [ "$exitcode" -ne 130 ]; then
-    echo "Error: Terminal launch failed with exit code $exitcode"
-    exit "$exitcode"
+    echo "Error: Terminal launch failed with exit code $exitcode"  # Inform user of failure
+    exit "$exitcode"  # Exit with the error code if terminal launch failed
 fi
