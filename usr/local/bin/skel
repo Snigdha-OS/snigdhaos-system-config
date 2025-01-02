@@ -1,34 +1,48 @@
 #!/bin/bash
 
 # Ask the user whether to copy contents from /etc/skel to the Home directory
-echo "Copy contents from /etc/skel to Home directory? (Y/n)"
+echo "Do you want to copy contents from /etc/skel to your Home directory? (Y/n)"
 read -r response
 
+# Convert the response to lowercase for case-insensitive comparison
+response=$(echo "$response" | tr '[:upper:]' '[:lower:]')
+
 # Check if the user agrees (Y or y)
-if [[ "$response" == [yY] ]]; then
-    # Get current date and time to append to backup folder name
+if [[ "$response" == "y" || "$response" == "yes" || -z "$response" ]]; then
+    # Get the current date and time to append to backup folder name
     time=$(date +%Y.%m.%d-%H.%M.%S)
 
     # Ensure the ~/.config directory exists, if not, create it
     if [ ! -d "$HOME/.config" ]; then
+        echo "Creating .config directory in the Home directory."
         mkdir -p "$HOME/.config"
     fi
 
     echo
     # Notify user about the backup of .config folder
-    echo "Backing up .config folder to $HOME/.config-backup-$time"
+    echo "Backing up the .config folder to $HOME/.config-backup-$time"
     echo
 
     # Backup the current .config folder with a timestamped name
-    cp -Rf "$HOME/.config" "$HOME/.config-backup-$time"
+    # Using rsync for better error handling and file integrity
+    rsync -a --backup --suffix=-backup-"$time" "$HOME/.config" "$HOME/.config-backup-$time"
+    
+    # Check if the backup was successful
+    if [ $? -eq 0 ]; then
+        echo "Backup completed successfully!"
+    else
+        echo "Error: Backup failed."
+        exit 1
+    fi
 
     echo
     # Inform the user that the .config folder will be overwritten
-    echo "Overwriting existing .config folder with files from /etc/skel"
+    echo "Overwriting the existing .config folder with files from /etc/skel."
     echo
 
     # Copy the contents of /etc/skel to the user's home directory
-    cp -r /etc/skel/. "$HOME"
+    # Using rsync to avoid overwriting files without backups
+    rsync -a /etc/skel/ "$HOME"
 
     echo
     echo "Task Completed!"
@@ -37,6 +51,6 @@ if [[ "$response" == [yY] ]]; then
 else
     # User chose not to make any changes
     echo
-    echo "No change made!"
+    echo "No changes were made."
     echo
 fi
