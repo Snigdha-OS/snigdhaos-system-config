@@ -17,11 +17,12 @@ check_connectivity() {
     local test_ip="8.8.8.8"
     local test_count=1
 
+    echo "Checking network connectivity..."
     if ping -c "$test_count" "$test_ip" > /dev/null 2>&1; then
         echo "System is Online."
         Online=1
     else
-        echo "System is Offline!"
+        echo "System is Offline."
         Online=0
     fi
 }
@@ -46,34 +47,36 @@ check_file
 if [ "$Online" -eq 1 ]; then
     echo "Downloading Default Grub..."
     if ! sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/grub -O "$workdir/etc/default/grub"; then
-        echo "Failed to download the default grub file!"
+        echo "Failed to download the default grub file! Exiting."
         exit 1
     fi
+    echo "Downloaded default grub file successfully."
 fi
 
 # Handle offline situation: use local grub file if available
 if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 1 ]; then
-    echo "Copying local Grub config..."
+    echo "Using local Grub config..."
     if ! sudo cp /usr/local/share/snigdhaos/grub/grub /etc/default/grub; then
-        echo "Failed to copy the local grub file!"
+        echo "Failed to copy the local grub file! Exiting."
         exit 1
     fi
-    echo "Local Grub config copied!"
+    echo "Local Grub config copied successfully."
 fi
 
 # Handle offline situation with missing local file: notify user
 if [ "$Online" -eq 0 ] && [ "$file_boolean" -eq 0 ]; then
-    echo "Run this script once you are back online."
+    echo "No network connection and local grub file missing."
+    echo "Please run this script once you are back online, or ensure the local grub file is available."
     exit 1
 fi
 
 # Regenerate the grub configuration
 echo "Regenerating Grub configuration..."
 if ! sudo grub-mkconfig -o /boot/grub/grub.cfg; then
-    echo "Failed to regenerate Grub configuration!"
+    echo "Failed to regenerate Grub configuration! Exiting."
     exit 1
 fi
 
 echo
-echo "Task Completed!"
+echo "Grub reinstallation and configuration completed successfully!"
 echo
