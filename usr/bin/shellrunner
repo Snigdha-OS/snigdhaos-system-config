@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# List of common terminal emulators
+terminals=("gnome-terminal" "konsole" "xfce4-terminal" "lxterminal" "mate-terminal" "tilix" "alacritty" "urxvt" "xterm" "kitty" "terminator" "st" "cool-retro-term" "tilda" "guake")
+
+# Function to open a terminal
+open_terminal() {
+    for term in "${terminals[@]}"; do
+        if command -v "$term" &> /dev/null; then
+            case "$term" in
+                "gnome-terminal"|"mate-terminal"|"tilix"|"terminator")
+                    "$term" &
+                    ;;
+                "konsole")
+                    "$term" &
+                    ;;
+                "xfce4-terminal"|"lxterminal"|"alacritty"|"urxvt"|"xterm"|"kitty"|"st"|"cool-retro-term"|"tilda"|"guake")
+                    "$term" &
+                    ;;
+                *)
+                    echo "Unsupported terminal: $term"
+                    ;;
+            esac
+            exit 0
+        fi
+    done
+    echo "No supported terminal emulator found."
+    exit 1
+}
+
+# Execute the function
+open_terminal
