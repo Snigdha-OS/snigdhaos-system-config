@@ -23,6 +23,15 @@ Target = linux-jwrdegoede*
 
 [Action]
 Depends = grub
-Description = Pacman hook to update-grub automatically
+Description = Updating GRUB configuration automatically after kernel operations
 When = PostTransaction
-Exec = /bin/sh -c "grub-mkconfig -o /boot/grub/grub.cfg"
+Exec = /bin/sh -c "
+if command -v grub-mkconfig >/dev/null 2>&1; then
+    echo 'Updating GRUB configuration...';
+    grub-mkconfig -o /boot/grub/grub.cfg && \
+    echo 'GRUB configuration updated successfully.' || \
+    echo 'Error: Failed to update GRUB configuration.' >&2;
+else
+    echo 'Error: grub-mkconfig not found. Ensure GRUB is installed.' >&2;
+    exit 1;
+fi"
