@@ -1,18 +1,20 @@
-   ..                                    ..   
-   .c:'                                ':c'   
-   .ccc:'                            ':ccc'   
-   .ccccc:'                        ':ccccc'   
-   .ccccccc:,                    ,:ccccccc'   
-   .cccc 'ccc:,.              .,:ccc, cccc'   
-   .cccc   'cc.       ,,        cc'   cccc'   
-   .cccc            ,:ccc,.           cccc'   
-   .cccc         .,cccccccc;.         cccc'   
-    :ccc:'       .ccc'  .cccc;.     ':ccc:    
-      :ccc:,              .cccc:..,:ccc:      
-        ,cccc,              .cccccccc;        
-          'cccc,.             .cccc,          
-            .cccc;.  '::,.       .            
-              .cccc:cccccc;.                  
-                .ccccccccccc;                 
-                  .cccccccc.                  
-                     cccc.
+                   WK0OO0X
+               WKOxk0XWNXkxN
+           WXOxk0N        kk
+        WKkxOXW          NxO
+     NX0ddk00OOOOkkkkkkkkk0
+ WKkxO0dOXXNNNNWWW WXKK
+NxkN   kxW       XOxxdN
+KoX    WkxX    WkxK Xd0
+WxkW     XkkX  kkW   NkxX
+ W0dK      XxOWkkW     XxkN
+   NkxX     XoKWkxK      Kd0
+     XkkN  WOdN  NkxX     NxO
+       OxNKxOW     XdO     kk
+       kdk0W        XoK WXkxN
+   WNNXKXXXXKKKK000OOdxkk0X
+  KdOO000KKKKXXXXX0xx0W
+ XoK          N0kx0N
+ Nd0      NKOxOKW
+  Nkk0K0kxOKN
+    WXXXN
