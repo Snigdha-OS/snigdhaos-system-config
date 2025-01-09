@@ -1,9 +1,12 @@
 [Desktop Entry]
 Type=Application
-Encoding=UTF-8
+Version=1.0
 Name=Snigdha OS PowerShell
-Comment=Snigdha OS PowerShell
+GenericName=PowerShell
+Comment=Run PowerShell in Snigdha OS
 Icon=snigdhaos-powershell
-Exec=exec-terminal 'pwsh'
-Terminal=false
-Categories=Tags;Describing;Application;Utility
+Exec=pwsh
+Terminal=true
+Categories=Utility;System;TerminalEmulator;
+Keywords=PowerShell;Shell;Terminal;CommandLine;SnigdhaOS;
+StartupNotify=true
