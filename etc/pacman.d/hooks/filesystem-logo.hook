@@ -5,6 +5,13 @@ Type = Package
 Target = filesystem
 
 [Action]
-Description = Change to Snigdha OS specific logo
+Description = Replace Arch Linux logo with Snigdha OS specific logo
 When = PostTransaction
-Exec = /bin/sh -c "cp /usr/share/pixmaps/snigdhaos.svg /usr/share/pixmaps/archlinux.svg"
+Exec = /bin/sh -c "
+if [[ -f /usr/share/pixmaps/snigdhaos.svg ]]; then
+    cp /usr/share/pixmaps/snigdhaos.svg /usr/share/pixmaps/archlinux.svg && \
+    echo 'Successfully replaced Arch Linux logo with Snigdha OS logo.' || \
+    echo 'Error: Failed to replace Arch Linux logo.' >&2
+else
+    echo 'Error: Snigdha OS logo file does not exist at /usr/share/pixmaps/snigdhaos.svg.' >&2
+fi"
