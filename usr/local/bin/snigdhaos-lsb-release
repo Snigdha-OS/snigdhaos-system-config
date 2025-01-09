@@ -4,23 +4,41 @@
 SOURCE_FILE="/usr/local/share/snigdhaos/release/lsb-release-snigdhaos"
 TARGET_FILE="/etc/lsb-release"
 
+# Function to display a message with a timestamp
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
+
 echo
-echo "Applying lsb Release..."
+log_message "Starting the lsb-release update process..."
 
 # Check if the source file exists
 if [[ ! -f "$SOURCE_FILE" ]]; then
-    echo "Error: Source file '$SOURCE_FILE' does not exist."
+    log_message "Error: Source file '$SOURCE_FILE' does not exist."
+    exit 1
+fi
+
+# Check if the target file is writable (or replaceable)
+if [[ -e "$TARGET_FILE" && ! -w "$TARGET_FILE" ]]; then
+    log_message "Error: Target file '$TARGET_FILE' exists but is not writable. Please check permissions."
     exit 1
 fi
 
 # Attempt to copy the source file to the target location
 if sudo cp "$SOURCE_FILE" "$TARGET_FILE"; then
-    echo "Successfully copied $SOURCE_FILE to $TARGET_FILE."
+    log_message "Successfully copied $SOURCE_FILE to $TARGET_FILE."
 else
-    echo "Error: Failed to copy $SOURCE_FILE to $TARGET_FILE."
+    log_message "Error: Failed to copy $SOURCE_FILE to $TARGET_FILE."
     exit 1
 fi
 
-echo
-echo "Task Completed!"
+# Verify if the file was successfully copied
+if [[ -f "$TARGET_FILE" ]]; then
+    log_message "Verification successful: '$TARGET_FILE' exists."
+else
+    log_message "Error: Verification failed. '$TARGET_FILE' does not exist after copying."
+    exit 1
+fi
+
+log_message "Task Completed!"
 echo
