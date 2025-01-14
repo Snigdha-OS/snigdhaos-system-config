@@ -46,7 +46,7 @@ check_file
 # If the system is online, download the latest pacman.conf
 if [ "$Online" -eq 1 ]; then
     echo "Downloading pacman.conf..."
-    if ! sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-updater/master/pacman.conf -O "$workdir/etc/pacman.conf"; then
+    if ! sudo wget -q https://raw.githubusercontent.com/Snigdha-OS/snigdhaos-archiso/refs/heads/master/archiso/pacman.conf -O "$workdir/etc/pacman.conf"; then
         echo "Error: Failed to download pacman.conf!"
         exit 1
     fi
